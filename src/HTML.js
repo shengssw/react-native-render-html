@@ -47,6 +47,7 @@ export default class HTML extends PureComponent {
         ptSize: PropTypes.number.isRequired,
         baseFontStyle: PropTypes.object.isRequired,
         textSelectable: PropTypes.bool,
+        hasHighlight: PropTypes.bool,
         renderersProps: PropTypes.object,
         allowFontScaling: PropTypes.bool
     }
@@ -65,6 +66,7 @@ export default class HTML extends PureComponent {
         tagsStyles: {},
         classesStyles: {},
         textSelectable: false,
+        hasHighlight: false,
         allowFontScaling: true
     }
 
@@ -84,7 +86,7 @@ export default class HTML extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { html, uri, renderers } = prevProps;
+        const { html, uri, renderers, hasHighlight } = prevProps;
         let doParseDOM = false;
 
         this.generateDefaultStyles(this.props.baseFontStyle);
@@ -95,7 +97,10 @@ export default class HTML extends PureComponent {
             // If the source changed, register the new HTML and parse it
             this.registerDOM(this.props);
         }
-        if (this.state.dom !== prevState.dom) {
+        if (this.state.dom !== prevState.dom || hasHighlight !== prevState.hasHighlight) {
+            this.setState({
+                hasHighlight: false,
+            })
             this.parseDOM(this.state.dom, this.props);
         }
     }
@@ -396,7 +401,8 @@ export default class HTML extends PureComponent {
             ignoredStyles,
             ptSize,
             tagsStyles,
-            textSelectable
+            textSelectable,
+            hasHighlight
         } = props;
 
         return RNElements && RNElements.length ? RNElements.map((element, index) => {
